@@ -1,0 +1,16 @@
+ Shivam Baghele  JPMorgan  Male  9.8  CSE  18LPA  baghelesp@rknec.edu  88888765888
+ Rohit Bhojwani  JPMorgan  Male  9.0  CSE  18LPA  bhojwani@rknec.edu  9877987623
+ Rajesh Thakre  Wipro  Male  8.0  CSE  7LPA  thakrers@rknec.edu  5678998765
+ Leonard Hofstader  Wipro  Male  9.4  ECE  4LPA  hofstaderl@rknec.edu  1111111111
+ Sheldon Cooper  Informatica  Male  10.0  CSE  20.27LPA  coopers@rknec.edu  1234561190
+ Priya Koothrapali  Infosys  Female  7.99  IT  60.7LPA  kotthrap@rknec.edu  4444444444
+ Sahil Chharra  Accenture  Male  8.09  CSE  50.7LPA  chharrasr@rknec.edu  1234567890
+ Rashmi Tiwari  Infosys  Female  9.99  CSE  50.12LPA  tiwarir@rknec.edu  1555567890
+ Sagar Mandal  Accenture  Male  8.99  CSE  50.7LPA  mandalss@rknec.edu  1234567890
+ Rajesh Koothrapalli  Accenture  Male  8.34  ECE  5.7LPA  kotthrar@rknec.edu  1111567890
+ Kelly Kapoor  JPMorgan  Female  6.78  ECE  10.7LPA  kapoork@dundermifflin.org  2222222222
+ Mithila Paalkar  Informatica  Female  6.99  CSE  20.7LPA  paalkarm@rknec.edu  3333333333
+ Emma Stone  Accenture  Female  9.99  CSE  56.7LPA  stoneem@rknec.edu  6666666666
+ Virginia Woolf  Accenture  Female  5.99  CSE  39.7LPA  woolfv@rknec.edu  8888888888
+
+ 
