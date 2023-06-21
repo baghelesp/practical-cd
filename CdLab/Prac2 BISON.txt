@@ -1,0 +1,511 @@
+Write YACC specification to check syntax of a simple expression involving operators +, -, *
+and /. Also convert the arithmetic expression to postfix.
+
+LEX:
+%{
+
+#include "y.tab.h"
+
+%}
+
+%%
+
+[0-9]+ {yylval=atoi(yytext); return NUMBER;}
+
+[a-zA-Z] {return ID;}
+
+\n {return NL;}
+
+. {return yytext[0];}
+
+%%
+
+
+Yacc:
+%{
+#include<stdio.h>
+#include<stdlib.h>
+%}
+
+%token NUMBER ID NL 
+%left '+' '-'
+%left '*' '/'
+
+%%
+stmt : exp NL { printf("\n");} 
+; 
+
+exp : exp '+' exp  	{printf("+");}
+| exp '-' exp		{printf("-");}
+| exp '*' exp		{printf("*");}
+| exp '/' exp		{printf("/");}
+| '(' exp ')'		
+| NUMBER 		{printf("%d",$$);}
+;
+
+
+%%
+int yyerror(char *msg)
+{
+return printf("Error YACC: %s\n",msg);
+}
+int main()
+{
+printf("Enter the expression : \n");
+yyparse();
+return 0;
+}
+int yywrap(){return 1;}
+
+
+
+-----------------------------------------------------------------------------
+
+
+Write a YACC specification to accept strings that starts and ends with 0 or 1
+L= {strings that starts and ends with 0 or 1}
+
+Lex:
+%{
+#include<stdlib.h>
+#include "y.tab.h"
+%}
+
+%%
+0 {yylval=0;return ZERO;}
+1 {yylval=1;return ONE;}
+.|\n {yylval=2;return 0;}
+%%
+
+
+Yacc:
+%{
+#include<stdio.h>
+#include<stdlib.h>
+int yylex(void);
+int yyerror(const char* );
+%}
+
+%token ZERO ONE
+
+%%
+
+stmt : str {printf("\nValid String\n\n");}
+;
+  
+str : n
+| ZERO a
+| ONE b
+;
+  
+a : n a
+| ZERO
+;
+  
+b : n b
+| ONE
+;
+  
+n : ZERO
+| ONE
+;
+
+%%
+
+int yyerror(const char *str) 
+{
+ printf("\nInvalid string, please enter a valid string!\n");   
+ return 0;     
+}
+
+int main() 
+ {
+    printf("\nEnter Sequence of Zeros and Ones : ");
+/* yyparse() takes input from user */
+    yyparse();
+    return 0;
+ }
+
+int yywrap(){return 1;}
+
+
+-----------------------------------------------------------------------------
+
+
+To validate syntax of following programing language construct:
+
+1] if else statement:
+
+Lex:
+%{
+#include<stdlib.h>
+#include "y.tab.h"
+%}
+
+%%
+"if" {return IF;}
+"(" {return OP;}
+")" {return CP;}
+"else" {return ELSE;}
+"{" {return OB;}
+"}" {return CB;}
+";" {return SEMI;}
+[0-9]+ {return NUMBER;}
+([a-zA-Z]|[0-9])* {return ID;}
+[a-zA-Z]+\(["][a-zA-Z]+["]+\) {return FUNC;}
+"<="|"<"|">="|"=="|"!="|">"|"&&"|"||"|"+=" {return CMP;}
+"++"|"--" {return INCDEC;}
+\n {return NL;}
+. {return yytext[0];}
+%%
+
+
+YACC:
+/*C declarations*/
+%{
+#include<stdlib.h>
+#include<stdio.h>
+%}
+
+/*yacc declarations*/
+%token ID NUM IF ELSE CMP OP CP OB CB INCDEC NL SEMI FUNC
+%right '='
+%left '+' '-'
+%left '*''/''%'
+
+/*Rules section*/
+
+%%
+stmt:stmt2 NL
+| stmt1 NL
+;
+stmt2: IF OP ID CMP ID CP OB FUNC SEMI CB {printf("BLOCK IS VALID.\n"); exit(0);}
+;
+stmt1: IF OP ID CMP ID CP OB ID CMP ID SEMI CB ELSE OB ID CMP ID SEMI CB {printf("BLOCK IS VALID..\n");exit(0);}
+;
+code: exp ';'
+| FUNC ';'
+;
+exp: ID ‘=’ exp
+| exp ‘+’ exp {$$=$1+$3;}
+| exp ‘-‘ exp {$$=$1-$3;}
+| exp ‘’ exp {$$=$1$3;}
+| exp ‘/’ exp {$$=$1/$3;}
+| exp ‘%’ exp
+| exp ‘+=’ exp
+| exp ‘-=’ exp
+| exp ‘*=’ exp
+| exp ‘/=’ exp
+| exp ‘%=’ exp
+| exp ‘>’ exp
+| exp ‘<’ exp
+| exp ‘<=’ exp
+| exp ‘>=’ exp
+| ID INCDEC
+| INCDEC ID
+| ID
+| NUMBER
+;
+%%
+
+int yyerror(const char* str)
+{
+   printf("Invalid statement!\n");
+   return 0;
+}
+
+int main() 
+ {
+    printf("\nEnter an if-else statement to check validation : ");
+/* yyparse() takes input from user */
+    yyparse();
+    return 0;
+ }
+
+int yywrap(){return 1;}
+
+
+
+
+2] for statement:
+
+YACC file ->
+%{
+#include <stdio.h>
+#include <stdlib.h>
+%}
+%token ID NUM FOR LE GE EQ NE OR AND ELSE ICR DCR
+%right '=' %left AND OR
+%left '<' '>' LE GE EQ NE
+%left '+''-' %left '*''/' %right UMINUS
+%left '!' %%
+S : ST {printf("\nInput accepted.\n");exit(0);};
+ST : FOR '(' E1 ';' E2 ';' E3 ')' '{' ST1 ';' '}' ;
+ST1 : ST
+| E
+;
+E : ID'='E
+| E'+'E
+| E'-'E
+| E'*'E
+| E'/'E
+| E'<'E
+| E'>'E
+| E LE E
+| E GE E
+| E EQ E
+| E NE E
+| E OR E
+| E AND E
+| ID
+| NUM
+;
+E1 : ID'='E1
+| ID
+| NUM
+;
+E2 : E'<'E
+| E'>'E
+| E LE E
+| E GE E
+| E EQ E
+| E NE E
+| E OR E
+| E AND E
+| ID
+| NUM
+;
+E3 : ID ICR
+|ID DCR
+%%
+void yyerror(const char *str) {
+printf("Invalid! ");
+}
+int main(int argc, char *argv[]) {
+printf("\nEnter FOR block: ");
+yyparse();
+printf("\n");
+return 0;
+}
+int yywrap(){return 1;}
+
+
+LEX file ->
+%{
+#include "y.tab.h" %}
+alpha [A-Za-z]
+digit [0-9]
+%%
+[ \t\n]
+for return FOR;
+{digit}+ return NUM;
+{alpha}({alpha}|{digit})* return ID; "<=" return LE; ">=" return GE; "==" return EQ; "!=" return NE; "++" return ICR; "--" return DCR; "||" return OR; "&&" return AND;
+. return yytext[0];
+%%
+
+
+
+3] while loop:
+
+Lex:
+alpha [A-Za-z]
+digit [0-9]
+%%
+[ \t\n]
+while return WHILE;
+{digit}+ return NUM;
+{alpha}({alpha}|{digit})* return ID;
+"<=" return LE;
+">=" return GE;
+"==" return EQ;
+"!=" return NE;
+"||" return OR;
+"&&" return AND;
+. return yytext[0];
+%%
+
+
+
+Yacc:
+%{
+#include <stdio.h>
+#include <stdlib.h>
+%}
+%token ID NUM WHILE LE GE EQ NE OR AND
+%right '='
+%left AND OR
+%left '<' '>' LE GE EQ NE
+%left '+''-'
+%left '*''/'
+%right UMINUS
+%left '!'
+%%
+S : ST1 {printf("Input accepted.\n");exit(0);};
+ST1 : WHILE'(' E2 ')' '{' ST '}'
+ST : ST ST
+| E';'
+;
+E : ID'='E
+| E'+'E
+
+| E'-'E
+| E'*'E
+| E'/'E
+| E'<'E
+| E'>'E
+| E LE E
+| E GE E
+| E EQ E
+| E NE E
+| E OR E
+| E AND E
+| ID
+| NUM
+;
+E2 : E'<'E
+| E'>'E
+| E LE E
+| E GE E
+| E EQ E
+| E NE E
+| E OR E
+| E AND E
+| ID
+| NUM
+;
+%%
+#include "lex.yy.c"
+main()
+{
+printf("Enter the exp: ");
+yyparse();
+}
+
+
+
+4] Do while
+
+Lex-
+%{
+#include "y.tab.h"
+%}
+%%
+do      { return DO; }
+\{      { return OB; }
+\}      { return CB; }
+while   { return WHILE; }
+\(      { return OP; }
+\)      { return CP; }
+[=]     { return EQUALTO; }
+[<>]    { return RELOP; } // separate character classes for each operator
+[!][=]  { return RELOP; }
+[\|][\|] { return RELOP; }
+[\&][\&] { return RELOP; }
+[0-9]+  { return NUMBER; }
+[a-zA-Z]+ { return ID; } // use "+" to match entire identifier
+\;      { return SEMICOLON; }
+\n      { return NL; }
+[\t '']+  { } // skip whitespace
+.       { return yytext[0]; }
+%%
+
+
+
+YACC:
+%{
+#include<stdio.h>
+#include<stdlib.h>
+int answer=0;
+%}
+%token DO OB NUMBER EQUALTO ID RELOP CB WHILE OP CP SEMICOLON NL
+%%
+r : s SEMICOLON NL {printf("\nSequence Accepted\n\n"); exit(0);}
+;
+s : DO OB exp1 CB WHILE OP exp2 RELOP exp2 CP
+;
+exp1 :ID EQUALTO exp2 SEMICOLON | 
+;
+exp2 : ID | NUMBER | exp
+;
+exp :
+ID'+'ID
+| ID '-' ID
+| ID '*' ID
+| ID '/' ID
+| NUMBER '+' ID
+| NUMBER '-' ID
+| NUMBER '*' ID
+| NUMBER '/' ID
+| ID'+'NUMBER
+| ID '-' NUMBER
+| ID '*' NUMBER
+| ID '/' NUMBER
+| NUMBER'+'NUMBER
+| NUMBER '-' NUMBER
+| NUMBER '*' NUMBER
+| NUMBER '/' NUMBER
+;
+%%
+int yyerror(char *msg)
+{
+    printf("\nInvalid Expression \n");
+    exit(0);
+}
+int main()
+{
+    printf("\nEnter the expression : \n");
+    yyparse();
+    return 0;
+}
+int yywrap()
+{
+    return 1;
+}
+
+
+-----------------------------------------------------------------------------
+
+
+Write YACC specification to recognize strings that can be accepted by grammar of the form:
+a^n b^n c, n>=1
+
+Lex:
+%{
+#include "grammar.y"
+%}
+%%
+[a]+[b]+{yylval.count = yyleng / 2; return ANBN;}
+[c]+ {return C;}
+.|\n {return yytext[0];}
+%%
+int yywrap() {
+return 1;
+}
+
+
+
+Yacc:
+%{
+#include <stdio.h>
+#include <stdlib.h>
+%}
+%token ANBN C
+%union {
+int count;
+}
+%%
+string: ANBN C {if ($1 != $3) {yyerror("Invalid input"); exit(1);} else {printf("Parsed %d a's
+and %d b's\n", $1, $2);}} ;
+%%
+int main() {
+yyparse();
+return 0;
+}
+int yyerror(char* msg) {
+printf("%s\n", msg);
+return 0;
+}
+int yylex() {
+return yylex();
+}
+

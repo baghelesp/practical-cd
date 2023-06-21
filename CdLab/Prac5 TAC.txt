@@ -1,0 +1,135 @@
+Write a program to generate three address code for the given language construct
+using SDTS.
+
+1] if-then-else
+----------------------------------------------------------------------------
+2] for loop
+
+----------------------------------------------------------------------------
+3] while loop
+from prettytable import PrettyTable
+
+def while_loop(cleaned_code):
+    final_code = []
+    while_idx = None
+    for i in range(len(cleaned_code)):
+        codeline = cleaned_code[i]
+
+        if 'while' in codeline:
+            while_idx = i
+
+            start_idx = codeline.index('(')
+            end_idx = codeline.index(')')
+      
+            bool_condn = ''.join(codeline[start_idx:end_idx+1])
+            final_code.append('if !{} goto({})'.format(bool_condn,None))
+            while_idx = i
+        elif '}' in codeline:
+            final_code.append('goto({})'.format(while_idx+1))
+            final_code[while_idx] = final_code[while_idx].replace('None',str(i+2))
+            while_idx = None
+        else:
+            final_code.append(codeline)
+    return final_code
+
+
+with open('code.txt') as f:
+    code = f.readlines()
+
+print('\n-----Statement-----')
+print(''.join(code))
+
+cleaned_code = []
+for i in range(len(code)):
+    if code[i] != '\n':
+        if code[i][-1] == '\n':
+         
+            cleaned_code.append(code[i][:-1].strip())
+        else:
+            cleaned_code.append(code[i].strip())
+
+final_code = while_loop(cleaned_code)
+
+final_code.append('END')
+
+print('\nThree Address Code-')
+x1 = PrettyTable()
+x1.field_names = ['Index','Code']
+for i in range(len(final_code)):
+	x1.add_row([i+1,final_code[i]])
+
+print(x1)
+
+
+----------------------------------------------------------------------------
+
+4] do while loop
+
+def do_while_loop(code_lines):
+    final_code = []
+    current_index = None
+    do_indices = []
+    temp_index = 0
+    
+    for i in range(len(code_lines)):
+        line = code_lines[i]
+        if 'do' in line:
+            current_index = i
+            do_indices.append(i + 1)
+        elif 'while' in line:
+            current_index = i
+            new_id = line.index('(')
+            end_index = line.index(')')
+            bool_condition = ''.join(line[new_id:end_index + 1])
+            final_code.append('if !{} goto({})'.format(bool_condition, do_indices.pop()))
+            current_index = i
+        elif '}' in line:
+            final_code.append('goto({})'.format(current_index + 1))
+            final_code[current_index] = final_code[current_index].replace('None', str(i + 2))
+            current_index = None
+        else:
+            assignment = line.split('=')
+            if len(assignment) == 2:
+                lhs = assignment[0].strip()
+                rhs = assignment[1].strip()
+                if '+' in rhs:
+                    operator = '+'
+                elif '-' in rhs:
+                    operator = '-'
+                elif '*' in rhs:
+                    operator = '*'
+                elif '/' in rhs:
+                    operator = '/'
+                else:
+                    operator = None
+                if operator:
+                    temp_var = 't{}'.format(temp_index)
+                    temp_index += 1
+                    final_code.append('{} = {} {} {}'.format(temp_var, rhs.split(operator)[0].strip(), operator, rhs.split(operator)[1].strip()))
+                    final_code.append('{} = {}'.format(lhs, temp_var))
+                else:
+                    final_code.append(line)
+            else:
+                final_code.append(line)
+    return final_code
+
+with open('dowhile.txt') as f:
+    code_lines = f.readlines()
+
+print('Given do-while-loop code is:')
+print(''.join(code_lines))
+
+cleaned_code = []
+for i in range(len(code_lines)):
+    if code_lines[i] != '\n':
+        if code_lines[i][-1] == '\n':
+            cleaned_code.append(code_lines[i][:-1].strip())
+        else:
+            cleaned_code.append(code_lines[i].strip())
+
+final_code = do_while_loop(cleaned_code)
+final_code.append('END')
+
+print('Serial No \tThree address code')
+for i in range(len(final_code)):
+    print(i + 1, "\t\t"+final_code[i])

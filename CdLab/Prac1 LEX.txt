@@ -1,0 +1,218 @@
+Design a lexical analyzer to identify the tokens such as keywords, identifiers, operators, constants (Int &amp; float), special symbols and strings for C language using LEX. Use File for the input.
+
+
+%{
+#include<stdio.h>
+int c_keyword=0, c_identifier=0, c_operator=0, c_constants=0, s_symbols=0,str=0 ;
+%}
+%%
+auto|break|case|char|const|continue|default|do|double|else|enum|extern|float|for|goto|if|int|long|register|return|short|signed|sizeof|static|struct|switch|typedef|union|unsigned|void|volatile|while|printf {c_keyword++;}
+"+"|"-"|"*"|"/"|"%"|"++"|"--"|"=="|"!="|">"|"<"|">="|"<="|"&&"|"||"|"!"|"=" {c_operator++;}
+[a-zA-Z]+[a-zA-Z0-9]* {c_identifier++;}
+"~"|"!"|"#"|"$"|"%"|"^"|"&"|"*"|"("|")"|"_"|"+"|","|"."|"/"|"|"|"\"|"`"|"-"|"="|"<"|">"|"?"|"["|"]"|":"|"""|";" {s_symbols++;}
+\".*\" {str++;}
+%%
+int main(void)
+{
+yyin= fopen("myfile.txt","r");
+yylex();
+printf(" This file has-");
+printf("\n\t%d keywords", c_keyword);
+printf("\n\t%d identifiers", c_identifier);
+printf("\n\t%d operators", c_operator);
+printf("\n\t%d symbols", s_symbols);
+}
+int yywrap()
+{
+return(1);
+}
+
+
+
+
+%{
+#include<stdbool.h>
+#include<string.h>
+#include<stdio.h>
+#include<stdlib.h>
+int statements=0;
+%}
+
+%option yylineno
+%option noyywrap
+
+%%
+\n {statements++;}
+(if|else|while|do|break|continue|int|double|float|return|char|case|sizeof|long|short|typedef|switch|unsigned|void|static|struct|goto|auto|enum|register|extern|union|const|signed|default|volatile) {printf("\t %s is a keyword\n", yytext);}
+[a-zA-Z]+([a-zA-Z][0-9])* {printf("\t %s is an Identifier\n", yytext);}
+[0-9]* {printf("\t %s is a digit\n", yytext);}
+(<|>|<=|>=|==) {printf("\t %s is special character\n", yytext);}
+\".*\" {printf("\t %s is a string", yytext);}
+. {;}
+%%
+
+int main(void)
+{
+yyin= fopen("myfile.txt","r");
+yylex();
+return(1);
+}
+
+ 
+-------------------------------------------------------------------------------------------
+
+Write a Lex program to find the parameters given below. Consider as input a question paper
+of an examination and find:
+Date of examination, semester, number of questions, numbers of words, lines, small letters,
+capital letters, digits, and special characters.
+
+
+
+%{
+#include<stdio.h>
+int words=0, lines=0, sletter=0, cletter=0, digits=0, sp=0,sem=0, nq=0;
+char word[]= "Question";
+%}
+%%
+[a-z] sletter++;
+[A-Z] cletter++;
+\n { lines++; words++;}
+[' '] words++;
+[0-9] digits++;
+(I|II|III|IV|V|VI|VII|VIII)  {printf("%s\t",yytext);}
+"~"|"!"|"#"|"$"|"%"|"^"|"&"|"*"|"("|")"|"_"|"+"|","|"."|"/"|"|"|"\"|"`"|"-"|"="|"<"|">"|"?"|"["|"]"|":"|"""|";" {sp++;}
+[a-zA-Z]+    { if(strcmp(yytext, word)==0)
+                   nq++; }
+%%
+main(void)
+{
+yyin= fopen("e2.txt","r");
+yylex();
+printf("\n\n\tThis file has-");
+printf("\n\t%d lines", lines+1);
+printf("\n\t%d words", words);
+printf("\n\t%d small letters", sletter);
+printf("\n\t%d capital letters", cletter);
+printf("\n\t%d digits", digits);
+printf("\n\t%d special characters", sp);
+printf("\n\t%d questions", nq);
+
+}
+int yywrap()
+{
+return(1);
+}
+
+
+
+
+
+
+
+
+%{
+#include<stdlib.h>
+#include<string.h>
+int Qcount=0,numLines=0,sLetter=0,cLetter=0,digit=0,specChar=0,numWord=0,date=0,day=0,month=0,year=0;
+char word[]= "Question";
+%}
+
+%option noyywrap 
+
+%%
+\n  {numLines++,numWord++;}
+[0-9]  {digit++;}
+^(0?[1-9]|[1][0-9]|3[01])[- /.]([1-9]|0[1-9]|1[012])[- /.](19|20)\d\d$  {printf("Date of examination: %s",yytext);}
+(I|II|III|IV|V|VI|VII|VIII)  {printf("Semester: %s",yytext);}
+[$&+,:;=?@#|'<>.^*()%!-] {specChar++;}
+[a-z]  {sLetter++;}
+[A-Z]  {cLetter++;}
+[a-zA-Z]+    { if(strcmp(yytext, word)==0)
+                   Qcount++; }
+
+[\t ' ']  {numWord++;}
+.  {;}        
+%%
+
+int main(void)
+{
+extern FILE *yyin;
+yyin= fopen("paper.txt","r");
+yylex();
+printf("\nNumber of lines: %d\nNumber of questions: %d\nNumber of small letters: %d\n",numLines,Qcount,sLetter);
+printf("Number of capital letters: %d\nNumber of digits: %d\nNumber of special characters: %d\n",cLetter,digit,specChar);
+printf("Number of words: %d\n",numWord);
+return(1);
+}
+
+
+
+
+-------------------------------------------------------------------------------------------
+
+
+
+Create a txt file to containing the following without heading: Name of Student, Company
+Placed in (TCS, Infosys, Wipro, Accenture, Informatica), Male/female, CGPA (floating point
+number), Department (CSE, IT, EC), Package (floating point number), mail id, mobile number
+(integer exactly 10 digits). At least 25 records must be present.
+
+
+%{
+#include<stdio.h>
+int i=0;
+%}
+%option noyywrap
+
+%%
+"TCS"|"Infosys"|"Wipro"|"Accenture"|"Informatica" {i++;printf("Company -  %s\n",yytext);}
+[1-9][0-9]{9} {i++;printf("Mobile Number - %s\n",yytext);}
+[0-9]*"."[0-9]+ {i++;printf("CGPA - %s\n", yytext);}
+"CSE"|"IT"|"EC" {i++;printf("Department: %s\n",yytext);}
+[a-z.0-9]+@[a-z]+(".com"|".in") {i++;printf("Email - %s\n",yytext);}
+"Female"|"Male"|"female"|"male" {i++;printf("Gender - %s\n",yytext);}
+[A-Z]* {i++;printf("College: %s\n",yytext);}
+[A-Z]+[a-z]* {i++;printf("\nName of Student: %s\n",yytext);}
+[1-9][0-9] {i++;printf("Age of the student: %s\n",yytext);}
+[1-9](0000|00000) {i++;printf("Salary of the student: %s\n",yytext);}
+. {;}
+%%
+
+int main(void){
+yyin=fopen("e3.txt","r");
+yylex();
+return(1);
+}
+
+
+
+
+%{
+#include<stdio.h>
+int i=0,count=0;
+%}
+
+%option noyywrap
+
+%%
+"TCS"|"Infosys"|"Wipro"|"Accenture"|"Informatica" {i++;printf("Company: %s\n",yytext);}
+[1-9][0-9]{9} {i++;printf("Student's Mobile Number: %s\n",yytext);}
+"Female"|"Male"|"female"|"male" {i++;printf("Gender of the student: %s\n",yytext);}
+[0-9]*"."[0-9]+ {i++;printf("CGPA: %s\n", yytext);}
+"CSE"|"IT"|"EC" {i++;printf("Department: %s\n",yytext);}
+[a-z.0-9]+@[a-z]+(".com"|".in") {i++;printf("Email ID: %s\n",yytext);}
+[A-Z]* {i++;printf("College: %s\n",yytext);}
+[A-Z]+[a-z]* {i++;printf("\nName of Student: %s\n",yytext);}
+[1-9][0-9] {i++;printf("Age of the student: %s\n",yytext);}
+[1-9](0000|00000) {i++;printf("Salary of the student: %s\n",yytext);}
+[\n] {count++;}
+. {;}
+%%
+
+int main(void){
+yyin=fopen("sample.txt","r");
+yylex();
+printf("---------------------------------\n");
+printf("Number of students got placement: %d\n",count+1);
+return(1);
+}

@@ -1,0 +1,4 @@
+do{
+    c=a+b;
+    d=a*b;
+}while(c<a);
